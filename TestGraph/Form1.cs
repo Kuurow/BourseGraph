@@ -61,7 +61,6 @@ namespace TestGraph
             graphics.DrawString("0", DefaultFont, whiteBrush, xMin - 15, yMax + 5);
             graphics.DrawString(hauteurMax, DefaultFont, whiteBrush, 0, yMin);
             graphics.DrawString(largeurMax, DefaultFont, whiteBrush, xMax - 20, yMax + 5);
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
