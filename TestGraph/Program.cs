@@ -19,9 +19,12 @@ namespace TestGraph
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
 
-            DataBinary dataFichierBinaire = new DataBinary();
+            DataToBinary dataFichierBinaire = new DataToBinary();
+            BinaryToForm binaireToForm = new BinaryToForm();
 
             dataFichierBinaire.index();
+            binaireToForm.Init();
+            binaireToForm.rechercherMinMaxOuverture();
         }
     }
 }

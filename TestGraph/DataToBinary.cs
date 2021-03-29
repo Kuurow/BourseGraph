@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Xml;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace TestGraph
 {
@@ -27,20 +27,20 @@ namespace TestGraph
         }
     }
 
-    public class DataBinary
+    public class DataToBinary
     {
         static public int[] MonthDaysbix = new int[] { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
         static public int[] MonthDays = new int[] { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
         static public int nbChampsStructFichData = 0;
         static public char[] charsSeparateur = new char[] { ' ', (char)9 }; // (char)9 = "\t" qui est le tab
-        static int countLines = 0;           
+        static int countLines = 0;
         static public BinaryWriter bw;
         static public float[] tableauLigneA = new float[7];
         static public float[] tableauLigneB = new float[7];
         static public long nbCotation = 0;
 
         static public string dataTextFilePath = @"..\..\..\CAC_40_1990_test.txt";
-        const string dataBinaryFilePath = @"..\..\..\data.dat";
+        static public string dataBinaryFilePath = @"..\..\..\data.dat";
 
         static int IsLeapYear(int Year)
         // Recherche si l'année est bisextile ou non
@@ -49,6 +49,16 @@ namespace TestGraph
                 return 1;
             else
                 return 0;
+        }
+
+        public string getBinaryFilePath()
+        {
+            return dataBinaryFilePath;
+        }
+
+        public long getNbCotations()
+        {
+            return nbCotation;
         }
 
         static bool DoEncodeDate(int Year, int Month, int Day, ref float Date)
@@ -73,7 +83,7 @@ namespace TestGraph
                 }
                 result = Year * 365 + cptAnneesBis;
 
-                for (int i = 0; i <= Month-1; i++)
+                for (int i = 0; i <= Month - 1; i++)
                 {
                     result += tabAnnee[i];
                     //nbJoursDsMois += tabAnnee[i];
@@ -115,14 +125,14 @@ namespace TestGraph
 
             for (int i = 0; i <= decodedYear; i++) // On va calculer le nombre d'années bissextiles entre l'année 0 et l'année décodée
             {
-                if (IsLeapYear(i)==1)
+                if (IsLeapYear(i) == 1)
                 {
                     cptNbAnneesBis++;
                     //Console.Write(i + " ");
                 }
             }
             float resteDate = encodedDate - (decodedYear * 365 + cptNbAnneesBis); // on retire le nombre de jours par année * l'année décodée et 
-                                                                                    // aussi le nombre de jours qu'il manque avec les années bissextiles
+                                                                                  // aussi le nombre de jours qu'il manque avec les années bissextiles
 
             if (IsLeapYear(decodedYear) == 1) tabAnnee = MonthDaysbix; // On récupère le tableau de jours d'une année 
             else tabAnnee = MonthDays;                                 // bissextile ou non en fonction de l'année décodée
@@ -150,7 +160,7 @@ namespace TestGraph
         // Lecture du fichier txt
         {
             foreach (string line in lines)
-            {       
+            {
                 if (line.Length != 0)
                 {
                     countLines++;
@@ -243,7 +253,7 @@ namespace TestGraph
                 {
                     result[y] = Convert.ToSingle(tokensVerifies[y]);
                 }
-                
+
                 DoEncodeDate((int)result[2], (int)result[1], (int)result[0], ref Date); // Encodage
 
                 DoDecodeDate((int)Date, ref Date); // Decodage
@@ -282,11 +292,11 @@ namespace TestGraph
             writer.Write(curDate.Faible);
             writer.Write(curDate.Cloture);
             writer.Write(curDate.ClotureAjuste);
-            writer.Write(curDate.Volume);           
+            writer.Write(curDate.Volume);
         }
 
         static void AfficherBinaire(string file)
-        {          
+        {
             FileStream fs = File.Open(file, FileMode.Open);
             fs.Seek(0, SeekOrigin.Begin);
             BinaryReader br = new BinaryReader(fs); //traduit de binaire en données lisibles 
@@ -302,7 +312,7 @@ namespace TestGraph
                 Console.WriteLine(br.ReadSingle() + " ");
                 Console.Write(": Numéro octet : " + nbChampsStructFichData + " | "); nbChampsStructFichData++;
                 Console.WriteLine("Position du reader : " + fs.Position);
-                if (fs.Position % 28 == 0) 
+                if (fs.Position % 28 == 0)
                 {
                     Console.WriteLine(fs.Position / 28);
                     Console.WriteLine();
@@ -311,7 +321,7 @@ namespace TestGraph
             Console.WriteLine("\n-----------------");
 
             br.Close();
-            fs.Close();        
+            fs.Close();
         }
 
         static void InverserFichierBinaire()
@@ -322,7 +332,7 @@ namespace TestGraph
 
             //Console.WriteLine("Nbr lignes : " + nbCotation + "\n");
 
-            for (int i1 = 0; i1 <= (nbCotation/2) - 1; i1++) 
+            for (int i1 = 0; i1 <= (nbCotation / 2) - 1; i1++)
             {
                 int i2 = (int)nbCotation - i1 - 1;
 
@@ -346,7 +356,7 @@ namespace TestGraph
             }
 
             br.Close();
-            fs.Close();                
+            fs.Close();
         }
 
         static void EcrireLigne(int numLigne, float[] tabChangement) // On écrit le tableau récupéré par la méthode LireLigne <tabChangement>(passage par référence) 
@@ -370,13 +380,13 @@ namespace TestGraph
             float max = tabDeRecherche[0];
 
 
-            for(int i = 1; i < tabDeRecherche.Length-1; i++)
+            for (int i = 1; i < tabDeRecherche.Length - 1; i++)
             {
-                if(tabDeRecherche[i] > max)
+                if (tabDeRecherche[i] > max)
                 {
                     max = tabDeRecherche[i];
                 }
-                else if(tabDeRecherche[i] < min)
+                else if (tabDeRecherche[i] < min)
                 {
                     min = tabDeRecherche[i];
                 }
@@ -401,7 +411,7 @@ namespace TestGraph
 
             AfficherBinaire(dataBinaryFilePath);
 
-            Console.WriteLine(nbCotation);
+            //Console.WriteLine(nbCotation);
         }
     }
 }
