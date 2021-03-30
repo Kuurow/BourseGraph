@@ -39,7 +39,7 @@ namespace TestGraph
         static public float[] tableauLigneB = new float[7];
         static public long nbCotation = 0;
 
-        static public string dataTextFilePath = @"..\..\..\CAC_40_1990_test.txt";
+        static public string dataTextFilePath = @"..\..\..\CAC_40_1990_test2.txt";
         static public string dataBinaryFilePath = @"..\..\..\data.dat";
 
         static int IsLeapYear(int Year)
@@ -244,7 +244,7 @@ namespace TestGraph
 
                 } // Fin traitement des tokens non vérifiés
 
-                Console.WriteLine("avant trad" + tokensVerifies[8]);
+                //Console.WriteLine("avant trad" + tokensVerifies[8]);
 
                 float Date = 0;
                 float[] result = new float[9];
@@ -260,7 +260,7 @@ namespace TestGraph
 
                 //Console.WriteLine("");
 
-                Console.WriteLine(result[8]);
+                //Console.WriteLine(result[8]);
 
                 DonneesBourse curDate = new DonneesBourse
                 {
@@ -400,16 +400,16 @@ namespace TestGraph
             bw = new BinaryWriter(File.Create(dataBinaryFilePath)); // vas traduire en binaire et stocker dans la variable visée 
             bw.Close();
 
-            Console.WriteLine("Contenu de CAC_40_1990_test = ");
+            //Console.WriteLine("Contenu de CAC_40_1990_test = ");
 
             LectureTxt(lines);
 
-            AfficherBinaire(dataBinaryFilePath);
+            //AfficherBinaire(dataBinaryFilePath);
 
             InverserFichierBinaire();
             //Console.WriteLine("inversion du fichier binaire effectuée!\n");
 
-            AfficherBinaire(dataBinaryFilePath);
+            //AfficherBinaire(dataBinaryFilePath);
 
             //Console.WriteLine(nbCotation);
         }

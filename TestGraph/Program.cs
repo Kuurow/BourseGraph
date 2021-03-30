@@ -22,9 +22,7 @@ namespace TestGraph
             DataToBinary dataFichierBinaire = new DataToBinary();
             BinaryToForm binaireToForm = new BinaryToForm();
 
-            dataFichierBinaire.index();
-            binaireToForm.Init();
-            binaireToForm.rechercherMinMaxOuverture();
+            dataFichierBinaire.index();           
         }
     }
 }
