@@ -39,7 +39,7 @@ namespace TestGraph
         static public float[] tableauLigneB = new float[7];
         static public long nbCotation = 0;
 
-        static public string dataTextFilePath = @"..\..\..\CAC_40_1990_test2.txt";
+        static public string dataTextFilePath = @"..\..\..\CAC_40_1990_test3.txt";
         static public string dataBinaryFilePath = @"..\..\..\data.dat";
 
         static int IsLeapYear(int Year)

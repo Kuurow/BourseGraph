@@ -86,5 +86,20 @@ namespace TestGraph
             setNombreCotations();
             return nbCotations;
         }
+
+        public float CalculerMoyenneMobilePourJour(int jour, int nbJourMM, FileStream fsMM, BinaryReader brMM)
+        {
+            float MMPourJour = 0;
+            int jourDebutMoyenne = jour - nbJourMM;
+            for (int i = jourDebutMoyenne; i < jour; i++)
+            {
+                fsMM.Seek((28 * i) + 4, SeekOrigin.Begin);
+                MMPourJour += brMM.ReadSingle();
+            }
+
+            MMPourJour = MMPourJour / nbJourMM;
+
+            return MMPourJour;
+        }
     }
 }
