@@ -19,6 +19,7 @@ namespace TestGraph
 
     public partial class Form1 : Form
     {
+        private Random rnd = new Random();
         public float[] tabMinMaxAbsciseDate = new float[2];
         public float[] tabMinMaxOrdonneeOuv = new float[2];
         public long nbrPoints = 0;
@@ -34,38 +35,6 @@ namespace TestGraph
         public Form1()
         {
             InitializeComponent();
-        }
-
-        /*
-         * METHODE A REVOIR (FONCTIONNEMENT INTERNE) ET VOIR POUR UN CHANGEMENT DE COULEUR POUR CHAQUE MOYENNE MOBILE
-         */
-        public void FaireMoyenneMobile(int nbJoursMM = 20)
-        {
-            Brush blue = new SolidBrush(Color.Blue);  // initialisation de la couleur
-            Pen bluePen = new Pen(blue, 1);           // Crée le crayon
-
-            FileStream fsMM = File.Open(dataBinaryFilePath, FileMode.Open);
-            BinaryReader brMM = new BinaryReader(fsMM); //traduit de binaire en données lisibles 
-
-            //n = n - 1;
-            for (int i = nbJoursMM; i < nbrPoints - 1; i++) // Fait nombre de ligne-1
-            {
-                // Initialisation des point avec l'échelle en ordonnée
-                fsMM.Seek(28 * i, SeekOrigin.Begin);
-                float x1px = AdapterTailleAbs(brMM.ReadSingle());
-                float y1px = AdapterTailleAbs(brMM.ReadSingle() / 2);
-
-                fsMM.Seek(28 * (i + 1), SeekOrigin.Begin);
-                // Initialisation des point avec l'échelle en abscise 
-                float x2px = AdapterTailleAbs(brMM.ReadSingle());
-                float y2px = AdapterTailleAbs(brMM.ReadSingle() / 2);
-
-                graphics.DrawLine(bluePen, x1px, y1px + HauteurPanel + pxMarge, x2px, y2px + HauteurPanel + pxMarge); // La marge est prise en compte et le nombre de viewport
-                //DrawStringFloatFormat(x1px, y1px + (HauteurPanel * n), y1px.ToString() + " " + x1px.ToString());
-            }
-
-            fsMM.Close();
-            brMM.Close();
         }
 
         public void InitVariables()
@@ -117,7 +86,7 @@ namespace TestGraph
             // Draw string to screen.
             graphics.DrawString(text, drawFont, drawBrush, x, y, drawFormat);
         }
-        public void DrawLineGraphCourbe(int n = 1)
+        public void DrawLineGraphCourbe(/*int n = 1*/)
         {
             Brush red = new SolidBrush(Color.Red);  // initialisation de la couleur
             Pen redPen = new Pen(red, 1);           // Crée le crayon
@@ -125,7 +94,7 @@ namespace TestGraph
             FileStream fs = File.Open(dataBinaryFilePath, FileMode.Open);
             BinaryReader br = new BinaryReader(fs); //traduit de binaire en données lisibles 
 
-            n = n - 1;
+            //n = n - 1;
             for (int i = 0; i < nbrPoints - 1; i++) // Fait nombre de ligne-1
             {
                 // Initialisation des point avec l'échelle en ordonnée
@@ -138,12 +107,61 @@ namespace TestGraph
                 float x2px = AdapterTailleAbs(br.ReadSingle());
                 float y2px = AdapterTailleOrd(br.ReadSingle());
 
-                graphics.DrawLine(redPen, x1px, y1px + (HauteurPanel * n) + (pxMarge * n), x2px, y2px + (HauteurPanel * n) + (pxMarge * n)); // La marge est prise en compte et le nombre de viewport
-                //DrawStringFloatFormat(x1px, y1px + (HauteurPanel * n), y1px.ToString() + " " + x1px.ToString());
+                //graphics.DrawLine(redPen, x1px, y1px + (HauteurPanel * n) + (pxMarge * n), x2px, y2px + (HauteurPanel * n) + (pxMarge * n)); // La marge est prise en compte et le nombre de viewport
+                graphics.DrawLine(redPen, x1px, y1px, x2px, y2px);
             }
 
             fs.Close();
             br.Close();
+        }
+        public void TracerMoyenneMobile(int nbJoursMM = 20)
+        {
+            float xEnd = 0;
+            float yEnd = 0;
+            Color randomColor = Color.FromArgb(255, rnd.Next(256), rnd.Next(256), rnd.Next(256));
+
+            Brush randomColorBrush = new SolidBrush(randomColor);  // initialisation de la couleur
+            Pen randomColorPen = new Pen(randomColorBrush, 1);           // Crée le crayon
+
+            FileStream fsMM = File.Open(dataBinaryFilePath, FileMode.Open);
+            BinaryReader brMM = new BinaryReader(fsMM); //traduit de binaire en données lisibles 
+
+            for (int i = nbJoursMM - 1; i < nbrPoints - 1; i++) // Fait nombre de ligne-1
+            {
+                //Console.WriteLine(i);
+
+                fsMM.Seek(28 * i, SeekOrigin.Begin); // On se place au niveau de la date encodée : premier point
+                float x1px = AdapterTailleAbs(brMM.ReadSingle());  // On lit la date encodée soit x1
+                float y1px = AdapterTailleOrd(FaireMoyenneMobileJour(i, fsMM, brMM, nbJoursMM));  // On va faire la moyenne pour i et obtenir y1
+
+                // pt 2
+                fsMM.Seek(28 * (i + 1), SeekOrigin.Begin); // On se place au niveau de la date encodée : second point
+                float x2px = AdapterTailleAbs(brMM.ReadSingle()); // On lit la date encodée soit x2
+                float y2px = AdapterTailleOrd(FaireMoyenneMobileJour(i + 1, fsMM, brMM, nbJoursMM)); // On va faire la moyenne pour i+1 et obtenir y2
+
+                graphics.DrawLine(randomColorPen, x1px, y1px, x2px, y2px);
+                xEnd = x2px - 3;
+                yEnd = y2px - 10;
+            }
+
+            graphics.DrawString("MM" + nbJoursMM, DefaultFont, randomColorBrush, xEnd, yEnd);
+
+            fsMM.Close();
+            brMM.Close();
+        }
+        public float FaireMoyenneMobileJour(int jour, FileStream fsMM, BinaryReader brMM, int nbJoursMM)
+        {
+            float valMoyenne = 0;
+
+            for (int y = 0; y < (nbJoursMM); y++)
+            {
+                //Console.WriteLine("i : " + i + " / y : " + y + " // i - y " + (i-y) + " /// 32 * (i-y) " + (i-y)*32 + " ## Max " + 28 * nbrPoints);
+                fsMM.Seek(28 * (jour - y), SeekOrigin.Begin);
+                brMM.ReadSingle(); // On lit sans stocker pour passer la date convertie
+                valMoyenne += brMM.ReadSingle();
+            }
+            valMoyenne = valMoyenne / nbJoursMM;
+            return valMoyenne;
         }
 
         //public void ViewPortDraw()
@@ -158,7 +176,6 @@ namespace TestGraph
         //    {
         //        for (int i = 1; i < nbrViewPort + 1; i++) // Fait nombre de View port
         //        {
-
         //            graphics.DrawLine(whitePen, pxMarge, (HauteurPanel * i) - HauteurPanel + pxMarge * i, pxMarge, (HauteurPanel * i) + (pxMarge * i));
         //            graphics.DrawLine(whitePen, pxMarge, (HauteurPanel * i) + (pxMarge * i), fondGraph.Width - pxMarge, (HauteurPanel * i) + (pxMarge * i));
         //            //DrawStringFloatFormat( 200, 290 * i, HauteurPanel.ToString() + " " + i.ToString()); // affiche la hauteur du panel et son numéro
@@ -171,10 +188,7 @@ namespace TestGraph
         //        graphics.DrawLine(whitePen, pxMarge, HauteurPanel + pxMarge, fondGraph.Width - pxMarge, HauteurPanel + pxMarge); // Axe abscisses
         //        DrawLineGraphCourbe();
         //    }
-
         //}
-        
-        
 
         private void fondGraph_Paint(object sender, PaintEventArgs e)
         {
@@ -210,7 +224,7 @@ namespace TestGraph
 
             if (Int32.TryParse(valeurMoyenneMobile, out valeurMoyenneMobileConvertie))
             {
-                FaireMoyenneMobile(valeurMoyenneMobileConvertie);
+                TracerMoyenneMobile(valeurMoyenneMobileConvertie);
             }
             else 
             {
@@ -220,6 +234,20 @@ namespace TestGraph
                 string title = "Erreur saisie moyenne mobile";
                 MessageBox.Show(message, title);
             }
+        }
+
+        private void btnClearMM_Click(object sender, EventArgs e)
+        {
+            Brush blackBrush = new SolidBrush(Color.Black);
+
+            Brush whiteBrush = new SolidBrush(Color.White);
+            Pen whitePen = new Pen(whiteBrush, 1);
+
+            graphics.FillRectangle(blackBrush, 0, 0, fondGraph.Width, fondGraph.Height);
+
+            graphics.DrawLine(whitePen, pxMarge, pxMarge, pxMarge, HauteurPanel + pxMarge); // Axe ordonnées
+            graphics.DrawLine(whitePen, pxMarge, HauteurPanel + pxMarge, fondGraph.Width - pxMarge, HauteurPanel + pxMarge); // Axe abscisses
+            DrawLineGraphCourbe();
         }
     }
 }

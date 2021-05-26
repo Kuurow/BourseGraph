@@ -30,22 +30,35 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnPanel = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.valueMoyenneMobile = new System.Windows.Forms.TextBox();
             this.btnAddMoyenne = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.fondGraph = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.valueMoyenneMobile = new System.Windows.Forms.TextBox();
+            this.btnClearMM = new System.Windows.Forms.Button();
             this.btnPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnPanel
             // 
+            this.btnPanel.Controls.Add(this.btnClearMM);
             this.btnPanel.Controls.Add(this.panel2);
             this.btnPanel.Controls.Add(this.btnAddMoyenne);
             this.btnPanel.Controls.Add(this.panel1);
             resources.ApplyResources(this.btnPanel, "btnPanel");
             this.btnPanel.Name = "btnPanel";
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.valueMoyenneMobile);
+            resources.ApplyResources(this.panel2, "panel2");
+            this.panel2.Name = "panel2";
+            // 
+            // valueMoyenneMobile
+            // 
+            resources.ApplyResources(this.valueMoyenneMobile, "valueMoyenneMobile");
+            this.valueMoyenneMobile.Name = "valueMoyenneMobile";
             // 
             // btnAddMoyenne
             // 
@@ -65,16 +78,12 @@
             this.fondGraph.Name = "fondGraph";
             this.fondGraph.Paint += new System.Windows.Forms.PaintEventHandler(this.fondGraph_Paint);
             // 
-            // panel2
+            // btnClearMM
             // 
-            this.panel2.Controls.Add(this.valueMoyenneMobile);
-            resources.ApplyResources(this.panel2, "panel2");
-            this.panel2.Name = "panel2";
-            // 
-            // valueMoyenneMobile
-            // 
-            resources.ApplyResources(this.valueMoyenneMobile, "valueMoyenneMobile");
-            this.valueMoyenneMobile.Name = "valueMoyenneMobile";
+            resources.ApplyResources(this.btnClearMM, "btnClearMM");
+            this.btnClearMM.Name = "btnClearMM";
+            this.btnClearMM.UseVisualStyleBackColor = true;
+            this.btnClearMM.Click += new System.EventHandler(this.btnClearMM_Click);
             // 
             // Form1
             // 
@@ -100,6 +109,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.TextBox valueMoyenneMobile;
+        private System.Windows.Forms.Button btnClearMM;
     }
 }
 
