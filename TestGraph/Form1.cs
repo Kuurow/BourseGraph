@@ -31,6 +31,7 @@ namespace TestGraph
         public string dataBinaryFilePath = @"..\..\..\data.dat";
         BinaryToForm binaryForm = new BinaryToForm();
         Graphics graphics;
+        public float[] tabDifferences;
 
         public Form1()
         {
@@ -210,6 +211,65 @@ namespace TestGraph
             graphics.DrawLine(whitePen, pxMarge, pxMarge, pxMarge, HauteurPanel + pxMarge); // Axe ordonnées
             graphics.DrawLine(whitePen, pxMarge, HauteurPanel + pxMarge, fondGraph.Width - pxMarge, HauteurPanel + pxMarge); // Axe abscisses
             DrawLineGraphCourbe();
+            TracerMoyenneMobile(20);
+            TracerMoyenneMobile(50);
+            TracerSignal();
+        }
+
+
+        public void TracerSignal(int moyenneCourte = 20, int moyenneLongue = 50)
+        {
+            int diffMM = moyenneLongue - moyenneCourte;
+
+            Brush greenBrush = new SolidBrush(Color.Green);  
+            Pen greenPen = new Pen(greenBrush, 1);
+
+            FileStream fsMM = File.Open(dataBinaryFilePath, FileMode.Open);
+            BinaryReader brMM = new BinaryReader(fsMM); 
+
+            for (int i = moyenneLongue - 1; i < nbrPoints - 1; i++) 
+            {
+                //Console.WriteLine(i);
+
+                fsMM.Seek(28 * i, SeekOrigin.Begin); 
+                float x1px = AdapterTailleAbs(brMM.ReadSingle());
+
+                float x1MMCourte = FaireMoyenneMobileJour(i, fsMM, brMM, moyenneCourte);
+                float x1MMLongue = FaireMoyenneMobileJour(i, fsMM, brMM, moyenneLongue);
+
+                float y1px = AdapterTailleOrd(FaireDifference(x1MMCourte, x1MMLongue));  // On va faire la moyenne pour i et obtenir y1
+
+                // pt 2
+                fsMM.Seek(28 * (i + 1), SeekOrigin.Begin); // On se place au niveau de la date encodée : second point
+                float x2px = AdapterTailleAbs(brMM.ReadSingle()); // On lit la date encodée soit x2
+
+                float x2MMCourte = FaireMoyenneMobileJour(i+1, fsMM, brMM, moyenneCourte);
+                float x2MMLongue = FaireMoyenneMobileJour(i+1, fsMM, brMM, moyenneLongue);
+
+                float y2px = AdapterTailleOrd(FaireDifference(x2MMCourte, x2MMLongue)); // On va faire la moyenne pour i+1 et obtenir y2
+
+                graphics.DrawLine(greenPen, x1px, y1px, x2px, y2px);
+            }
+
+            fsMM.Close();
+            brMM.Close();
+        }
+
+        public float FaireDifference(float MMCourte, float MMLongue)
+        {
+            float signal = 0;
+            float valDiff = MMCourte - MMLongue;
+
+            if (valDiff > 0)
+            {
+                signal = 1 + tabMinMaxOrdonneeOuv[1];
+            }
+            else
+            {
+                signal = 0 + tabMinMaxOrdonneeOuv[0];
+            }
+
+            return signal;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -248,6 +308,9 @@ namespace TestGraph
             graphics.DrawLine(whitePen, pxMarge, pxMarge, pxMarge, HauteurPanel + pxMarge); // Axe ordonnées
             graphics.DrawLine(whitePen, pxMarge, HauteurPanel + pxMarge, fondGraph.Width - pxMarge, HauteurPanel + pxMarge); // Axe abscisses
             DrawLineGraphCourbe();
+            TracerMoyenneMobile(20);
+            TracerMoyenneMobile(50);
+            TracerSignal();
         }
     }
 }
